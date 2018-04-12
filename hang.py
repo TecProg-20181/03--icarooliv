@@ -1,7 +1,7 @@
 import random
 import string
 
-WORDLIST_FILENAME = "palavras.txt"
+WORDLIST_FILENAME = "words.txt"
 
 
 def loadWords():
@@ -13,11 +13,15 @@ def loadWords():
     wordlist = line.split() 
     print ("  ", len(wordlist), "words loaded.")
 
-    return random.choice(wordlist)
+    return wordlist
+
+def chooseWord(wordlist):
+    word = random.choice(wordlist)
+    word.replace(" ", "")
+    
+    return word
 
 def isWordGuessed(secret_word, letters_guessed):
-    secretLetters = []
-
     for letter in secret_word:
         if letter in letters_guessed:
             pass
@@ -25,73 +29,70 @@ def isWordGuessed(secret_word, letters_guessed):
             return False
     return True
 
-def getGuessedWord():
-     guessed = ''
-     return guessed
+def getGuessedWord(secret_word, letters_guessed):
+    guessed = ''
+    
+    for letter in secret_word:
+        if letter in letters_guessed:
+            guessed += letter
+        else:
+            guessed += '_'
 
-def getAvailableLetters():
-    import string
+    return guessed
+
+def getAvailableLetters(letters_guessed):
     available = string.ascii_lowercase
+
+    for letter in available:
+        if letter in letters_guessed:
+            available = available.replace(letter, '_')
+
+
     return available
 
-def hangman(secret_word):
+def isValidWord(secret_word, guesses):
+    if len(secret_word) >= guesses:
+        print('An error ocurred. Try again.')    
+        return None
 
+def hangman(secret_word):
     guesses = 8
     letters_guessed = []
+
+    isValidWord(secret_word, guesses)
+
     print ('Welcome to the game, Hangam!')
     print ('I am thinking of a word that is', len(secret_word), ' letters long.')
     print ('-------------')
 
-    while  isWordGuessed(secret_word, letters_guessed) == False and guesses >0:
+    while isWordGuessed(secret_word, letters_guessed) == False and guesses > 0:
         print ('You have ', guesses, 'guesses left.')
 
-        available = getAvailableLetters()
-        for letter in available:
-            if letter in letters_guessed:
-                available = available.replace(letter, '')
-
+        available = getAvailableLetters(letters_guessed)
         print ('Available letters', available)
+
         letter = input('Please guess a letter: ')
+
         if letter in letters_guessed:
-
-            guessed = getGuessedWord()
-            for letter in secret_word:
-                if letter in letters_guessed:
-                    guessed += letter
-                else:
-                    guessed += '_ '
-
-            print ('Oops! You have already guessed that letter: ', guessed)
-        elif letter in secret_word:
+            print ('Oops! You have already guessed that letter: ', letter)
+        elif letter in letters_guessed:
             letters_guessed.append(letter)
-
-            guessed = getGuessedWord()
-            for letter in secret_word:
-                if letter in letters_guessed:
-                    guessed += letter
-                else:
-                    guessed += '_ '
-
-            print ('Good Guess: ', guessed)
-        else:
-            guesses -=1
+        else: 
+            guesses -= 1
             letters_guessed.append(letter)
+    
+        guessed = getGuessedWord(secret_word, letters_guessed)
+        print (guessed)
 
-            guessed = getGuessedWord()
-            for letter in secret_word:
-                if letter in letters_guessed:
-                    guessed += letter
-                else:
-                    guessed += '_ '
-
-            print ('Oops! That letter is not in my word: ',  guessed)
-        print ('------------')
-
+    if isWordGuessed(secret_word, letters_guessed):
+        print('Congratulations, you won! The word was ', secret_word, '.')
     else:
-        if isWordGuessed(secret_word, letters_guessed) == True:
-            print ('Congratulations, you won!')
-        else:
-            print ('Sorry, you ran out of guesses. The word was ', secret_word, '.')
+        print('Sorry, you ran out of guesses. The word was ', secret_word, '.') 
 
-secret_word = loadWords().lower()
-hangman(secret_word)
+def main():
+    new_wordlist = loadWords()
+    new_word = chooseWord(new_wordlist)
+
+    hangman(new_word)
+
+main()
