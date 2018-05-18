@@ -1,10 +1,7 @@
-from db import Database
-from hang import Hang
+from hang import Hangman
 
-def main():
-    db = Database()
-    new_hang = Hang(db)
-    new_hang.hangman()
+WORDLIST_FILENAME = "words.txt"
+GUESSES = 8
 
-if __name__ == '__main__':
-    main()
+GAME = Hangman(filename = WORDLIST_FILENAME, guesses=GUESSES)
+GAME.game()
