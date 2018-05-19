@@ -1,5 +1,7 @@
 import string
 import random
+import sys
+import os
 
 class Hangman:
 	import random
@@ -12,17 +14,22 @@ class Hangman:
 		self.get_random_word(filename)
 
 	def get_random_word(self, filename):	
-		print ("Loading word list from file...")
 		try:
-			file = open(filename, 'r')
-			line = file.readline()
-			wordlist = str.split(line)
-			print ('  ', len(wordlist), 'words loaded.')
-			self.secret_word = random.choice(wordlist).lower()
-		except IOError:
-			print('ERROR: FILE NOT FOUND!')
-			exit()
-	
+			if os.stat(filename).st_size > 0: 
+				print ("Loading word list from file...")
+				file = open(filename, 'r')
+				line = file.readline()
+				wordlist = str.split(line)
+				print ('  ', len(wordlist), 'words loaded.')
+				self.secret_word = random.choice(wordlist).lower()
+				self.is_valid_word()
+			else:
+				print('FILE EMPTY!!!')
+				sys.exit()
+		except OSError:
+			print('FILE NOT FOUND!')
+			sys.exit()
+
 	def load_database(self):
 		print ('Loading word list from file...')
 		try:
@@ -33,7 +40,7 @@ class Hangman:
 			return self.wordlist
 		except IOError:
 			print ("Whoops! Couldn't find file!")
-			quit()
+			sys.exit()
 
 	def choose_word(self):
 		word = random.choice(self.wordlist).lower()
@@ -65,8 +72,8 @@ class Hangman:
 
 	def is_valid_word(self):
 		if len(self.secret_word) >= self.guesses:
-			print('An error ocurred. Try again.')    
-			return None
+			print('An error ocurred. Your word has more characters than you have of guesses. Try again.')    
+			sys.exit()
 
 	def game(self):
 		print ('-------------\n')
